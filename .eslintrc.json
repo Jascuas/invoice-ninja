@@ -6,7 +6,8 @@
     },
     "extends": [
         "standard-with-typescript",
-        "plugin:react/recommended"
+        "plugin:react/recommended",
+        "plugin:@next/next/recommended"
     ],
     "parserOptions": {
         "ecmaVersion": "latest",
@@ -21,6 +22,9 @@
         "react/react-in-jsx-scope": "off",
         "@typescript-eslint/no-floating-promises": "off",
         "@typescript-eslint/explicit-function-return-type": "off",
-        "@typescript-eslint/no-misused-promises": "off"
+        "@typescript-eslint/no-misused-promises": "off",
+        "@typescript-eslint/semi": "off",
+        "@typescript-eslint/quotes": "off",
+        "@typescript-eslint/comma-dangle": "off"
     }
 }
