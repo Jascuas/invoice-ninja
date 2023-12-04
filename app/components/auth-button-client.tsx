@@ -20,7 +20,7 @@ export function AuthButton({ session }: { session: Session | null }) {
     const res = await supabase.auth.signInWithOAuth({
       provider: "github",
       options: {
-        redirectTo: "http://localhost:3000/auth/callback",
+        redirectTo: window?.location?.origin + "/auth/callback",
       },
     });
     console.log(res);
