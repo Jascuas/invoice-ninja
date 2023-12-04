@@ -20,7 +20,7 @@ export function AuthButton({ session }: { session: Session | null }) {
     const res = await supabase.auth.signInWithOAuth({
       provider: "github",
       options: {
-        redirectTo: window?.location?.origin + "/auth/callback",
+        redirectTo: process.env.NEXT_PUBLIC_VERCEL_URL + "/auth/callback",
       },
     });
     console.log(res);
