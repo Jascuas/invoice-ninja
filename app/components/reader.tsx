@@ -1,7 +1,7 @@
 "use client";
 
 import { Key, useCallback, useEffect, useRef, useState } from "react";
-import { experimental_useFormStatus } from "react-dom";
+import { useFormStatus } from "react-dom";
 
 import { parse } from "csv-parse";
 import { twMerge } from "tailwind-merge";
@@ -50,7 +50,7 @@ export default function ReaderClient({
   const [selectedUSers, setSelectedUSers] = useState<string[]>([]);
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const formRef = useRef<HTMLFormElement>(null);
-  const { pending } = experimental_useFormStatus();
+  const { pending } = useFormStatus();
   const user = session?.user;
   const handleFileUpload = async (
     event: React.ChangeEvent<HTMLInputElement>

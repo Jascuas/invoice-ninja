@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { Database } from "@/app/@types/database";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 
-export default async function RootLayout({
+export default async function LoginLayout({
   children,
 }: {
   children: React.ReactNode;

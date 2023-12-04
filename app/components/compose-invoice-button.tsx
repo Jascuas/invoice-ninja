@@ -1,8 +1,8 @@
 "use client";
 
-import { experimental_useFormStatus as useFormStatus } from "react-dom";
+import { useFormStatus } from 'react-dom';
 
-import { Button } from "@nextui-org/react";
+import { Button } from '@nextui-org/react';
 
 export function ComposeInvoiceButton() {
   const { pending } = useFormStatus();

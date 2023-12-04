@@ -16,8 +16,10 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
+  types,
 }: {
   children: React.ReactNode;
+  types: React.ReactNode;
 }) {
   const supabase = createServerComponentClient<Database>({ cookies });
   const {
