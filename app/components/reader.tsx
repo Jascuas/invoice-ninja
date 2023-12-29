@@ -63,6 +63,31 @@ export default function ReaderClient({
   };
   const idIsSelected = (id?: string) => selectedUSers?.some((uid) => uid == id);
 
+  const sortByDescription = (items: ProductInfo[]) => {
+    return items.sort((a, b) =>
+      a.description.localeCompare(b.description, undefined, {
+        sensitivity: "base",
+      })
+    );
+  };
+  const calculateUsersTotalArray = (productsInfo: ProductInfo[]) => {
+    const userTotal: { [userId: string]: number } = {};
+
+    productsInfo.forEach((p) => {
+      p.user_products?.forEach((userProduct: { user_id: { id: string } }) => {
+        const userId = userProduct.user_id.id;
+        userTotal[userId] =
+          (userTotal[userId] || 0) + p.amount / p.user_products.length;
+      });
+    });
+
+    const usersTotalArray = Object.keys(userTotal).map((userId) => ({
+      user_id: userId,
+      total: userTotal[userId],
+    }));
+
+    return usersTotalArray;
+  };
   const toggleIdInArray = (id?: string) => {
     if (!id) return;
     const index = selectedUSers?.indexOf(id);
@@ -78,12 +103,16 @@ export default function ReaderClient({
   };
   const updateProducts = (product: ProductInfo, products: ProductInfo[]) => {
     if (!data) return;
-    console.log(product);
-    console.log(products);
+
     const newProducts = data.productsInfo.filter((p) => p != product);
-    newProducts.push(...products);
-    console.log(newProducts);
-    setData({ ...data, productsInfo: newProducts });
+    const filterQuantity = products.filter((p) => p.quantity > 0);
+    newProducts.push(...filterQuantity);
+
+    setData({
+      ...data,
+      productsInfo: sortByDescription(newProducts),
+      usersTotal: calculateUsersTotalArray(newProducts),
+    });
     onClose();
   };
   const readCSV = async (text: string) => {
@@ -183,8 +212,8 @@ export default function ReaderClient({
         productIDs
       );
 
-      const productsInfo = items
-        ?.map((p) => {
+      const productsInfo = sortByDescription(
+        items?.map((p) => {
           const filtered = filterProducts?.find(
             (a) => a.external_id == p.description
           );
@@ -195,44 +224,20 @@ export default function ReaderClient({
             product_id: filtered?.id,
           };
         })
-        .sort((a, b) => {
-          const descriptionA = a.description.toUpperCase(); // Convert to uppercase for case-insensitive sorting
-          const descriptionB = b.description.toUpperCase();
+      );
 
-          if (descriptionA < descriptionB) {
-            return -1;
-          }
-          if (descriptionA > descriptionB) {
-            return 1;
-          }
-          return 0;
-        });
-      var userTotal: { [userId: string]: number } = {};
-      productsInfo.map((p) => {
-        p.user_products?.map((userProduct: { user_id: { id: string } }) => {
-          const userId = userProduct.user_id.id;
-          userTotal[userId] =
-            (userTotal[userId] || 0) + p.amount / p.user_products.length;
-        });
-      });
-
-      const usersTotalArray = Object.keys(userTotal).map((userId) => ({
-        user_id: userId,
-        total: userTotal[userId],
-      }));
       setData({
         total,
-        usersTotal: usersTotalArray,
+        usersTotal: calculateUsersTotalArray(productsInfo),
         productsInfo,
       });
     });
   };
+
   useEffect(() => {
     setSelectedUSers([session?.user.id, friends?.[0]?.friend_id?.id ?? ""]);
   }, []);
-  console.log("S", selectedUSers);
-  console.log(isOpen);
-  console.log(selectedProduct);
+
   return (
     <main className="flex gap-4 flex-col items-center justify-center">
       <div className="flex w-full flex-wrap gap-4">
@@ -401,7 +406,7 @@ const TableComp: React.FC<tableProps> = ({
       case "quantity":
         return (
           <p className="text-bold text-sm capitalize">
-            {setQuantityUnit(parseFloat(cellValue?.toString() ?? "0"))}
+            {setQuantityUnit(parseFloat(cellValue?.toFixed(3) ?? "0"))}
           </p>
         );
       case "unit_price":
@@ -523,7 +528,7 @@ const ModalComp = ({
   onOpenChange,
   updateProducts,
 }: modalProps) => {
-  console.log(product);
+  console.log({ product });
   if (!product) return;
   const { user_products, quantity, amount, unit_price, ...rest } = product;
 
@@ -545,7 +550,11 @@ const ModalComp = ({
     return !result || result === "NaN" ? "0.00" : result;
   };
   const [usersProduct, setUsersProduct] = useState(users);
-  console.log(users);
+  console.log({ usersProduct });
+
+  useEffect(() => {
+    setUsersProduct(users);
+  }, [product]);
 
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl">
@@ -612,7 +621,7 @@ const ModalComp = ({
                           onChange={(event) => {
                             let value = parseFloat(event.target.value) / 100;
                             let percentage = event.target.value;
-                            console.log(value);
+                            console.log({ value });
                             if (!value) value = 0;
                             if (value > 1) return;
 
@@ -635,7 +644,7 @@ const ModalComp = ({
                                 return u;
                               }
                             );
-                            console.log(newUsersPRoduct);
+                            console.log({ newUsersPRoduct });
                             setUsersProduct(newUsersPRoduct);
                           }}
                         />
