@@ -1,5 +1,5 @@
 "use client";
-import { Key, useCallback, useState } from "react";
+import { ChangeEvent, Key, useCallback, useState } from "react";
 
 import { twMerge } from "tailwind-merge";
 
@@ -7,6 +7,7 @@ import {
   Avatar,
   Button,
   Chip,
+  Input,
   Table,
   TableBody,
   TableCell,
@@ -46,6 +47,11 @@ export function ProductList({
 }) {
   const [selectedProducts, setSelectedProducts] = useState<Selection>();
   const [selectedUSers, setSelectedUSers] = useState<string[]>([]);
+  const [search, setSearch] = useState<string>("");
+  const [filterOn, setFilterOn] = useState<boolean>(false);
+  const [filteredProducts, setFilteredProducts] =
+    useState<UserProduct[]>(products);
+
   const user = session?.user.user_metadata;
 
   const renderCell = useCallback((item: UserProduct, columnKey: Key) => {
@@ -163,10 +169,27 @@ export function ProductList({
       });
     }
   };
+  const onFilterProducts = () => {
+    setFilterOn(!filterOn);
+    if (filterOn) return setFilteredProducts(products);
+    const filtered: UserProduct[] = products.filter((product) => {
+      if (product?.user_products.length == 0) return product;
+    });
+    setFilteredProducts(filtered);
+  };
+  const onSearchProduct = (event?: ChangeEvent<HTMLInputElement>) => {
+    const value = event?.target?.value ?? "";
+    setSearch(value);
+    const filtered: UserProduct[] = products.filter((product) => {
+      if (product?.description?.toLowerCase().includes(value.toLowerCase()))
+        return product;
+    });
+    setFilteredProducts(filtered);
+  };
 
   return (
     <>
-      <div className="flex flex-wrap -mx-3">
+      <div className="flex flex-wrap gap-4 w-full">
         <Card
           toggle={() => toggleIdInArray(session?.user.id)}
           selected={idIsSelected(session?.user.id)}
@@ -182,14 +205,14 @@ export function ProductList({
           colors="from-red-600 to-orange-600"
         />
       </div>
-      <div className="flex gap-4 ">
+      <div className="flex gap-4 items-end -mt-3">
         <Button
           onClick={onAddProducts}
           className="px-8"
           color="primary"
           type="submit"
         >
-          {"Add selected"}
+          Add selected
         </Button>
         <Button
           onClick={onRemoveProducts}
@@ -197,8 +220,27 @@ export function ProductList({
           color="danger"
           type="submit"
         >
-          {"Remove selected"}
+          Remove selected
         </Button>
+        <Button
+          onClick={onFilterProducts}
+          className="px-8"
+          color="default"
+          type="submit"
+        >
+          {filterOn ? "Unfilter" : "Filter"}
+        </Button>
+        <Input
+          value={search}
+          size="sm"
+          isClearable
+          className="max-w-xs"
+          type="text"
+          variant="underlined"
+          label="Search your product"
+          onClear={() => onSearchProduct()}
+          onChange={onSearchProduct}
+        />
       </div>
       <Table
         aria-label="Example table with dynamic content"
@@ -210,7 +252,10 @@ export function ProductList({
             <TableColumn key={column.key}>{column.label}</TableColumn>
           )}
         </TableHeader>
-        <TableBody items={products} emptyContent={"No rows to display."}>
+        <TableBody
+          items={filteredProducts}
+          emptyContent={"No rows to display."}
+        >
           {(item) => (
             <TableRow key={item?.id} className="cursor-pointer">
               {(columnKey) => (
@@ -232,7 +277,7 @@ interface cardProps {
 }
 const Card = ({ title, colors, avatar, selected, toggle }: cardProps) => {
   return (
-    <div className="w-full max-w-full px-3 mb-6  sm:flex-none xl:mb-0 xl:w-fit">
+    <div className="w-full max-w-full  mb-6  sm:flex-none xl:mb-0 xl:w-fit">
       <div
         onClick={toggle}
         className={twMerge(
@@ -240,13 +285,13 @@ const Card = ({ title, colors, avatar, selected, toggle }: cardProps) => {
           selected && "border-white"
         )}
       >
-        <div className="flex-auto p-4">
-          <div className="flex flex-row items-center justify-between">
+        <div className="flex-auto p-2 px-3">
+          <div className="flex gap-4 flex-row items-center justify-between">
             <Avatar size="sm" src={avatar} />
-            <div className="flex-none max-w-full px-3">
+            <div className="flex-none max-w-full ">
               <div>
-                <p className="mb-0 font-sans font-semibold leading-normal uppercase text-white opacity-60 text-xs">
-                  @{title}
+                <p className=" font-sans font-semibold leading-normal uppercase text-white opacity-60 text-xs">
+                  {title}
                 </p>
               </div>
             </div>

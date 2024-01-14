@@ -20,7 +20,7 @@ export default async function Invoices() {
   const user_products = await getUserProducts(friendsIDs);
   if (user_products)
     return (
-      <section className="flex flex-col w-full h-full gap-6 my-2">
+      <section className="flex flex-col w-full h-full gap-6 ">
         <ProductList
           products={user_products}
           session={session}
