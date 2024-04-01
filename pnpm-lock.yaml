@@ -35,6 +35,9 @@ dependencies:
   csv-parse:
     specifier: ^5.4.0
     version: 5.5.0
+  decl-modal:
+    specifier: ^0.0.4
+    version: 0.0.4
   echarts:
     specifier: ^5.4.3
     version: 5.4.3
@@ -3450,6 +3453,10 @@ packages:
         optional: true
     dependencies:
       ms: 2.1.2
+
+  /decl-modal@0.0.4:
+    resolution: {integrity: sha512-fCr2CwaNxqYpXACa4hpsIR9DsR1fI/ed/8C19c6RagRRIXJGjAmDRcSVFg0xC0IuhcyW3GTVfcyO0k37LEJPWA==}
+    dev: false
 
   /deep-is@0.1.4:
     resolution: {integrity: sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ==}

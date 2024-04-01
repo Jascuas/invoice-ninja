@@ -29,7 +29,9 @@ import { IconEdit, IconEye, IconTrash } from "@tabler/icons-react";
 
 import { Friend, ProductInfo } from "../@types/invoices";
 import { addReaderInvoice } from "../actions/add-invoice";
-import { addLineProducts, addProducts } from "../actions/add-products";
+import { addLineProducts } from "../actions/add-line-products";
+import { addProducts } from "../actions/add-products";
+import { addUserInvoiceTotal } from "../actions/add-user-invoice-total";
 import { getUserFilterProducts } from "../actions/get-user-products";
 import { formatCurrency } from "../utils";
 
@@ -292,15 +294,44 @@ export default function ReaderClient({
               action={async () => {
                 const invoice = await addReaderInvoice(data?.total ?? 0);
                 const invoice_id = invoice?.data?.[0].id;
-                const mapedProducst = data?.productsInfo?.map((p) => {
+                const mapedProducst: {
+                  description: string;
+                  invoice_id: any;
+                  quantity: number;
+                  amount: number;
+                  user_id: string;
+                  unit_price: number;
+                  product_id?: string | undefined;
+                }[] = [];
+
+                data?.productsInfo?.map((p) => {
                   const { user_products, ...rest } = p;
-                  return {
-                    ...rest,
-                    invoice_id,
-                  };
+                  if (user_products.length > 1) {
+                    user_products.map((user: { user_id: { id: any } }) => {
+                      mapedProducst.push({
+                        ...rest,
+                        amount: rest.amount / user_products.length,
+                        quantity: rest.quantity / user_products.length,
+                        invoice_id,
+                        user_id: user.user_id.id,
+                      });
+                    });
+                  } else
+                    mapedProducst.push({
+                      ...rest,
+                      invoice_id,
+                      user_id: user_products[0].user_id.id,
+                    });
                 });
 
                 await addLineProducts(mapedProducst);
+                const userTotals = data.usersTotal.map((userTotal) => ({
+                  invoice_id,
+                  total: userTotal.total,
+                  user_id: userTotal.user_id,
+                }));
+
+                await addUserInvoiceTotal(userTotals);
 
                 formRef.current?.reset();
               }}
@@ -528,7 +559,6 @@ const ModalComp = ({
   onOpenChange,
   updateProducts,
 }: modalProps) => {
-  console.log({ product });
   if (!product) return;
   const { user_products, quantity, amount, unit_price, ...rest } = product;
 

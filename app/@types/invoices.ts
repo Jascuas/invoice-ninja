@@ -3,6 +3,9 @@ import { type Database } from "../@types/database";
 type InvoicesEntity = Database["public"]["Tables"]["invoices"]["Row"];
 type UserEntity = Database["public"]["Tables"]["users"]["Row"] | null;
 type ProductEntity = Database["public"]["Tables"]["products"]["Row"] | null;
+type UserInvoiceTotalEntity =
+  | Database["public"]["Tables"]["user_invoice_total"]["Row"]
+  | null;
 type FriendsEntity = Database["public"]["Tables"]["friends"]["Row"] | null;
 type UserProductEntity =
   | Database["public"]["Tables"]["user_products"]["Row"]
@@ -31,6 +34,8 @@ export type User = UserEntity;
 export type Product = ProductEntity;
 
 export type InvoiceProduct = InvoiceProductEntity;
+
+export type UserInvoiceTotal = UserInvoiceTotalEntity;
 
 export type UserProduct = {
   description: string | null;
@@ -65,3 +70,9 @@ export type AddUserProduct = {
   product_id: string;
   user_id: string;
 } | null;
+
+export type AddUserInvoiceTotal = {
+  invoice_id: string;
+  total: number;
+  user_id: string;
+};
