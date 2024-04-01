@@ -35,8 +35,6 @@ export type Product = ProductEntity;
 
 export type InvoiceProduct = InvoiceProductEntity;
 
-export type UserInvoiceTotal = UserInvoiceTotalEntity;
-
 export type UserProduct = {
   description: string | null;
   external_id: string;
@@ -76,3 +74,12 @@ export type AddUserInvoiceTotal = {
   total: number;
   user_id: string;
 };
+
+export type UserInvoiceTotal =
+  | {
+      id: string;
+      invoice_id: string;
+      total: number;
+      user_id: string & UserEntity;
+    }[]
+  | null;

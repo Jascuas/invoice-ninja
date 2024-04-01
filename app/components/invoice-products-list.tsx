@@ -8,9 +8,10 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
+  User,
 } from "@nextui-org/react";
 
-import { InvoiceProduct } from "../@types/invoices";
+import { InvoiceProduct, UserInvoiceTotal } from "../@types/invoices";
 import { formatCurrency } from "../utils";
 
 const columns = [
@@ -19,7 +20,7 @@ const columns = [
     label: "DESCRIPTION",
   },
   {
-    key: "ownership",
+    key: "user_id",
     label: "OWNERSHIP",
   },
   {
@@ -38,83 +39,11 @@ const columns = [
 
 export function InvoiceProductsList({
   invoiceProducts,
+  invoiceUserTotal,
 }: {
   invoiceProducts: InvoiceProduct[];
+  invoiceUserTotal: UserInvoiceTotal;
 }) {
-  //   const mapedInvoices = invoices?.map((invoice) => {
-  //     if (!invoice || !invoice.user) return;
-  //     const { id, user, sub_total, created_at } = invoice;
-
-  //     const {
-  //       user_name: userName,
-  //       name: userFullName,
-  //       avatar_url: avatarUrl,
-  //     } = user;
-
-  //     return {
-  //       id,
-  //       created_at,
-  //       sub_total,
-  //       avatarUrl,
-  //       userFullName,
-  //       userName,
-  //     };
-  //   });
-
-  //   return mapedInvoices;
-  // }, [invoices]);
-
-  // const renderCell = useCallback((item: MapedInvoice, columnKey: Key) => {
-  //   const cellValue = item?.[columnKey as keyof MapedInvoice];
-  //   switch (columnKey) {
-  //     case "id":
-  //       return (
-  //         <Chip
-  //           className="capitalize"
-  //           color={"default"}
-  //           size="sm"
-  //           variant="flat"
-  //         >
-  //           {cellValue}
-  //         </Chip>
-  //       );
-  //     case "date":
-  //       return (
-  //         <p className="text-bold text-sm capitalize">
-  //           {" "}
-  //           {dateFormatLg(item?.created_at ?? "")}
-  //         </p>
-  //       );
-  //     case "sub_total":
-  //       return (
-  //         <p className="text-bold text-sm capitalize"> {item?.sub_total}</p>
-  //       );
-  //     case "user":
-  //       return (
-  //         <User
-  //           avatarProps={{ radius: "full", src: item?.avatarUrl }}
-  //           name={item?.userName}
-  //         />
-  //       );
-  //     case "actions":
-  //       return (
-  //         <div className="relative flex items-center gap-2">
-  //           <Tooltip content="Details">
-  //             <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-  //               <IconEye />
-  //             </span>
-  //           </Tooltip>
-  //           <Tooltip content="Edit user">
-  //             <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-  //               <IconPencil />
-  //             </span>
-  //           </Tooltip>
-  //         </div>
-  //       );
-  //     default:
-  //       return cellValue;
-  //   }
-  // }, []);
   const renderCell = useCallback((product: InvoiceProduct, columnKey: Key) => {
     function hasDecimal(number: number) {
       return number % 1 !== 0;
@@ -128,11 +57,27 @@ export function InvoiceProductsList({
     }
 
     const cellValue = product?.[columnKey as keyof InvoiceProduct] ?? "";
-
+    const user = invoiceUserTotal?.find(
+      (user) => user.user_id.id === product?.user_id
+    );
+    console.log(user);
+    if (!user) return;
     switch (columnKey) {
       case "description":
-      case "ownership":
         return <p className="text-bold text-sm capitalize">{cellValue}</p>;
+      case "user_id":
+        return (
+          <div className="flex gap-4">
+            <User
+              key={product?.product_id + user.user_id.id}
+              avatarProps={{
+                radius: "full",
+                src: user?.user_id.avatar_url,
+              }}
+              name={user?.user_id.user_name}
+            />
+          </div>
+        );
       case "quantity":
         return (
           <p className="text-bold text-sm capitalize">

@@ -9,7 +9,7 @@ import { AddUserProduct } from "../@types/invoices";
 
 export const addUserProducts = async (products?: AddUserProduct[]) => {
   if (products === null) return;
-  console.log(products);
+
   const supabase = createServerActionClient({ cookies });
   // revisar si el usuario realmene está autentificado
   const {
@@ -26,7 +26,6 @@ export const addUserProducts = async (products?: AddUserProduct[]) => {
     })
     .select();
 
-  console.log(res);
   revalidatePath(`/?content=${res.status}`);
   return res;
 };

@@ -23,7 +23,6 @@ export function AuthButton({ session }: { session: Session | null }) {
         redirectTo: window?.location?.origin + "/auth/callback",
       },
     });
-    console.log(res);
   };
 
   const handleSignOut = async () => {

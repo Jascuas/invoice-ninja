@@ -15,9 +15,6 @@ export const getUserProducts = async (user_id: string[]) => {
     .in("user_products.user_id", user_id)
     .order("description", { ascending: true });
 
-  console.log(userProducts);
-  console.log(rest);
-
   return userProducts;
 };
 
@@ -33,8 +30,6 @@ export const getUserFilterProducts = async (
     .in("user_products.user_id", user_id)
     .in("id", products)
     .order("description", { ascending: true });
-  console.log(userProducts);
-  console.log(rest);
 
   return userProducts;
 };

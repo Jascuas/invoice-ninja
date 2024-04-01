@@ -10,7 +10,7 @@ export const addProducts = async (products?: AddProduct[]) => {
   if (products === null) return;
 
   const supabase = createServerActionClient({ cookies });
-  // revisar si el usuario realmene está autentificado
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -21,8 +21,7 @@ export const addProducts = async (products?: AddProduct[]) => {
     .from("products")
     .upsert(products, { onConflict: "external_id" })
     .select();
-  console.log(res);
-  console.log(res.data);
+
   return res;
   //revalidatePath(`/?content=${sub_total.toString()}`);
 };

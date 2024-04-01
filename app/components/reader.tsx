@@ -219,7 +219,6 @@ export default function ReaderClient({
           const filtered = filterProducts?.find(
             (a) => a.external_id == p.description
           );
-          console.log(filtered);
           return {
             ...p,
             user_products: filtered?.user_products as any,
@@ -239,7 +238,6 @@ export default function ReaderClient({
   useEffect(() => {
     setSelectedUSers([session?.user.id, friends?.[0]?.friend_id?.id ?? ""]);
   }, []);
-
   return (
     <main className="flex gap-4 flex-col items-center justify-center">
       <div className="flex w-full flex-wrap gap-4">
@@ -331,9 +329,7 @@ export default function ReaderClient({
                   user_id: userTotal.user_id,
                 }));
 
-                await addUserInvoiceTotal(userTotals);
-
-                formRef.current?.reset();
+                const res = await addUserInvoiceTotal(userTotals);
               }}
             >
               <Button
@@ -580,7 +576,6 @@ const ModalComp = ({
     return !result || result === "NaN" ? "0.00" : result;
   };
   const [usersProduct, setUsersProduct] = useState(users);
-  console.log({ usersProduct });
 
   useEffect(() => {
     setUsersProduct(users);
@@ -650,8 +645,7 @@ const ModalComp = ({
                           value={formatN((p.quantity / quantity) * 100)}
                           onChange={(event) => {
                             let value = parseFloat(event.target.value) / 100;
-                            let percentage = event.target.value;
-                            console.log({ value });
+
                             if (!value) value = 0;
                             if (value > 1) return;
 
@@ -674,7 +668,7 @@ const ModalComp = ({
                                 return u;
                               }
                             );
-                            console.log({ newUsersPRoduct });
+
                             setUsersProduct(newUsersPRoduct);
                           }}
                         />
@@ -707,7 +701,7 @@ const ModalComp = ({
                                 return u;
                               }
                             );
-                            console.log(newUsersPRoduct);
+
                             setUsersProduct(newUsersPRoduct);
                           }}
                         />

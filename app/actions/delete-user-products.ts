@@ -24,6 +24,5 @@ export const deleteUserProducts = async (
     .eq("user_id", user_id)
     .in("product_id", products);
 
-  console.log(res);
   return res;
 };

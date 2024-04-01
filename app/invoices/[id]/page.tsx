@@ -1,17 +1,14 @@
 import { redirect } from "next/navigation";
 import { twMerge } from "tailwind-merge";
 
-import { Invoice, InvoiceProduct } from "@/app/@types/invoices";
+import { Invoice, UserInvoiceTotal } from "@/app/@types/invoices";
 import { getInvoice } from "@/app/actions/get-invoice";
 import { getInvoiceProducts } from "@/app/actions/get-invoice-products";
+import { getInvoiceUserTotal } from "@/app/actions/get-invoice-user-total";
 import { InvoiceProductsList } from "@/app/components/invoice-products-list";
 import { formatCurrency } from "@/app/utils";
-import {
-  IconBuildingBank,
-  IconCash,
-  IconCoin,
-  IconCoins,
-} from "@tabler/icons-react";
+import { Avatar } from "@nextui-org/react";
+import { IconCoin } from "@tabler/icons-react";
 
 import { getSession } from "../../actions/get-session";
 
@@ -20,13 +17,7 @@ type Props = {
     id?: string;
   };
 };
-// {
-//   params,
-//   searchParams,
-// }: {
-//   params: { slug: string };
-//   searchParams?: { [key: string]: string | string[] | undefined };
-// }
+
 export default async function Invoices({ params }: Props) {
   const session = getSession();
 
@@ -35,22 +26,25 @@ export default async function Invoices({ params }: Props) {
   }
   const invoice = await getInvoice(params?.id ?? "");
   const invoiceProducts = await getInvoiceProducts(params?.id ?? "");
-  console.log(invoice);
-
-  if (invoiceProducts && invoice)
+  const invoiceUserTotal = await getInvoiceUserTotal(params?.id ?? "");
+  console.log(invoiceProducts);
+  if (invoiceProducts && invoice && invoiceUserTotal)
     return (
       <section className="flex flex-col w-full h-full gap-6">
-        <Cards invoiceProducts={invoiceProducts} invoice={invoice} />
-        <InvoiceProductsList invoiceProducts={invoiceProducts} />
+        <Cards invoiceUserTotal={invoiceUserTotal} invoice={invoice} />
+        <InvoiceProductsList
+          invoiceProducts={invoiceProducts}
+          invoiceUserTotal={invoiceUserTotal}
+        />
       </section>
     );
 }
 
 const Cards = ({
-  invoiceProducts,
+  invoiceUserTotal,
   invoice,
 }: {
-  invoiceProducts: InvoiceProduct[];
+  invoiceUserTotal: UserInvoiceTotal;
   invoice: Invoice;
 }) => {
   return (
@@ -60,37 +54,28 @@ const Cards = ({
         content={formatCurrency(invoice?.sub_total ?? 0)}
         icon={<IconCoin />}
       />
-      <Card
-        title="Common"
-        content={formatCurrency(invoice?.sub_total ?? 0)}
-        icon={<IconBuildingBank />}
-        colors="from-emerald-500 to-teal-400"
-      />
-      <Card
-        title="Javier"
-        content={formatCurrency(invoice?.sub_total ?? 0)}
-        icon={<IconCash />}
-        colors="from-orange-500 to-yellow-500"
-      />
-      <Card
-        title="Adrian"
-        content={formatCurrency(invoice?.sub_total ?? 0)}
-        icon={<IconCoins />}
-        colors="from-red-600 to-orange-600"
-      />
+      {invoiceUserTotal?.map((user) => (
+        <Card
+          title={user.user_id.user_name}
+          content={formatCurrency(user.total ?? 0)}
+          avatar={user.user_id.avatar_url}
+        />
+      ))}
     </div>
   );
 };
 interface cardProps {
   title: string;
+  avatar?: string;
   content: string;
   subtitle?: string;
   contentSubtitle?: string;
   colors?: string;
-  icon: JSX.Element;
+  icon?: JSX.Element;
 }
 const Card = ({
   title,
+  avatar,
   content,
   subtitle,
   contentSubtitle,
@@ -120,11 +105,13 @@ const Card = ({
             </div>
             <div
               className={twMerge(
-                "flex items-center justify-center w-12 h-12 text-center rounded-circle bg-gradient-to-tl from-blue-500 to-violet-500 rounded-full",
-                colors
+                "flex items-center justify-center w-12 h-12 text-center rounded-circle  rounded-full",
+                colors,
+                icon && "bg-gradient-to-tl from-blue-500 to-violet-500"
               )}
             >
-              {icon}
+              {icon && icon}
+              {avatar && <Avatar size="md" src={avatar} />}
             </div>
           </div>
         </div>

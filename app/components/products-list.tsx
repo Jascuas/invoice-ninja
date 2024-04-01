@@ -149,12 +149,10 @@ export function ProductList({
         })
         .flat(); // Utiliza flat() para aplanar el array de arrays resultante
 
-      console.log(userProducts);
       await addUserProducts(userProducts);
     }
   };
   const onRemoveProducts = async () => {
-    console.log(selectedProducts);
     if (selectedProducts) {
       if (selectedProducts.toString() == "all") {
         return console.log("ALL");
@@ -163,7 +161,6 @@ export function ProductList({
       for (const item of selectedProducts) {
         newSelectedProducts.push(item.toString());
       }
-      console.log(newSelectedProducts);
       selectedUSers?.map(async (userId) => {
         await deleteUserProducts(userId, newSelectedProducts);
       });
