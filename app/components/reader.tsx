@@ -10,8 +10,7 @@ import {
   Avatar,
   Button,
   Card as NextUiCard,
-  CardFooter,
-  Image,
+  CardHeader,
   Modal,
   ModalBody,
   ModalContent,
@@ -53,7 +52,7 @@ export default function ReaderClient({
 }) {
   const [data, setData] = useState<CSVData | null>(null);
   const [boughtAt, setBoughtAt] = useState<Date>();
-  const [added, setAdded] = useState<Boolean>(true);
+  const [added, setAdded] = useState<Boolean>(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductInfo>();
   const [selectedUSers, setSelectedUSers] = useState<string[]>([]);
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
@@ -65,7 +64,7 @@ export default function ReaderClient({
     const dateString = name.substring(0, 8);
     // Extract year, month, and day from the string and convert them to numbers
     var year = parseInt(dateString.slice(0, 4), 10);
-    var month = parseInt(dateString.slice(4, 6), 10) - 1; // Subtracting 1 for zero-based month
+    var month = parseInt(dateString.slice(4, 6), 10);
     var day = parseInt(dateString.slice(6, 8), 10);
     const fileDate = new Date(year, month, day);
 
@@ -767,19 +766,10 @@ const Success = () => {
   return (
     <div className="w-full max-w-full  mb-6  sm:flex-none xl:mb-0 xl:w-fit">
       <NextUiCard isFooterBlurred radius="lg" className="border-none">
-      <LottiePlayer src={'/animations/done.lottie'} />
-        <CardFooter className="justify-between before:bg-white/10 border-white/20 border-1 overflow-hidden py-1 absolute before:rounded-xl rounded-large bottom-1 w-[calc(100%_-_8px)] shadow-small ml-1 z-10">
-          <p className="text-tiny text-white/80">Available soon.</p>
-          <Button
-            className="text-tiny text-white bg-black/20"
-            variant="flat"
-            color="default"
-            radius="lg"
-            size="sm"
-          >
-            Notify me
-          </Button>
-        </CardFooter>
+        <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
+          <h4 className="font-bold text-large">Invoice Added</h4>
+        </CardHeader>
+        <LottiePlayer src={"/animations/done.json"} className="w-52 h-52" />
       </NextUiCard>
     </div>
   );
