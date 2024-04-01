@@ -17,7 +17,7 @@ import {
 import { IconEye, IconPencil } from "@tabler/icons-react";
 
 import { Invoice } from "../@types/invoices";
-import { dateFormatLg } from "../utils";
+import { dateFormatLg, dateFormatSm } from "../utils";
 
 const columns = [
   {
@@ -27,6 +27,10 @@ const columns = [
   {
     key: "date",
     label: "DATE ADDED",
+  },
+  {
+    key: "bought_at",
+    label: "DATE BOUGHT",
   },
   {
     key: "sub_total",
@@ -46,14 +50,16 @@ type MapedInvoice =
       avatarUrl: string;
       userFullName: string;
       userName: string;
+      bought_at: string;
     }
   | undefined;
 
 export function InvoceLists({ invoices }: { invoices: Invoice[] }) {
+  console.log(invoices);
   const renderItems = useCallback(() => {
     const mapedInvoices = invoices?.map((invoice) => {
       if (!invoice || !invoice.user) return;
-      const { id, user, sub_total, created_at } = invoice;
+      const { id, user, sub_total, created_at, bought_at } = invoice;
 
       const {
         user_name: userName,
@@ -68,6 +74,7 @@ export function InvoceLists({ invoices }: { invoices: Invoice[] }) {
         avatarUrl,
         userFullName,
         userName,
+        bought_at,
       };
     });
 
@@ -93,6 +100,13 @@ export function InvoceLists({ invoices }: { invoices: Invoice[] }) {
           <p className="text-bold text-sm capitalize">
             {" "}
             {dateFormatLg(item?.created_at ?? "")}
+          </p>
+        );
+      case "bought_at":
+        return (
+          <p className="text-bold text-sm capitalize">
+            {" "}
+            {dateFormatSm(item?.bought_at ?? "")}
           </p>
         );
       case "sub_total":

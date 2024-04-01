@@ -9,6 +9,9 @@ import { twMerge } from "tailwind-merge";
 import {
   Avatar,
   Button,
+  Card as NextUiCard,
+  CardFooter,
+  Image,
   Modal,
   ModalBody,
   ModalContent,
@@ -34,6 +37,7 @@ import { addProducts } from "../actions/add-products";
 import { addUserInvoiceTotal } from "../actions/add-user-invoice-total";
 import { getUserFilterProducts } from "../actions/get-user-products";
 import { formatCurrency } from "../utils";
+import LottiePlayer from "./lottie-player";
 
 interface CSVData {
   total: number;
@@ -48,17 +52,34 @@ export default function ReaderClient({
   friends: Friend[] | undefined;
 }) {
   const [data, setData] = useState<CSVData | null>(null);
+  const [boughtAt, setBoughtAt] = useState<Date>();
+  const [added, setAdded] = useState<Boolean>(true);
   const [selectedProduct, setSelectedProduct] = useState<ProductInfo>();
   const [selectedUSers, setSelectedUSers] = useState<string[]>([]);
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const formRef = useRef<HTMLFormElement>(null);
   const { pending } = useFormStatus();
   const user = session?.user;
+
+  const extractDate = (name: string) => {
+    const dateString = name.substring(0, 8);
+    // Extract year, month, and day from the string and convert them to numbers
+    var year = parseInt(dateString.slice(0, 4), 10);
+    var month = parseInt(dateString.slice(4, 6), 10) - 1; // Subtracting 1 for zero-based month
+    var day = parseInt(dateString.slice(6, 8), 10);
+    const fileDate = new Date(year, month, day);
+
+    setBoughtAt(fileDate);
+  };
+
   const handleFileUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0];
+
     if (file) {
+      setAdded(false);
+      extractDate(file.name);
       const text = await file.text();
       readCSV(text);
     }
@@ -267,7 +288,7 @@ export default function ReaderClient({
             type="file"
           />
         </div>
-        {data && (
+        {data && !added && (
           <div className="flex w-full gap-4 items-center">
             <span>TOTAL: {formatCurrency(data?.total)}</span>
             {data.usersTotal.map((userTotal) => {
@@ -290,7 +311,10 @@ export default function ReaderClient({
             <form
               ref={formRef}
               action={async () => {
-                const invoice = await addReaderInvoice(data?.total ?? 0);
+                const invoice = await addReaderInvoice(
+                  data?.total ?? 0,
+                  boughtAt ?? new Date()
+                );
                 const invoice_id = invoice?.data?.[0].id;
                 const mapedProducst: {
                   description: string;
@@ -330,6 +354,7 @@ export default function ReaderClient({
                 }));
 
                 const res = await addUserInvoiceTotal(userTotals);
+                if (!res?.error) setAdded(true);
               }}
             >
               <Button
@@ -345,13 +370,14 @@ export default function ReaderClient({
           </div>
         )}
       </div>
-      {data && (
+      {data && !added && (
         <TableComp
           products={data?.productsInfo}
           onOpen={onOpen}
           selectProduct={(p: ProductInfo) => setSelectedProduct(p)}
         />
       )}
+      {added && <Success />}
       <ModalComp
         isOpen={isOpen}
         onOpenChange={onOpenChange}
@@ -733,5 +759,28 @@ const ModalComp = ({
         )}
       </ModalContent>
     </Modal>
+  );
+};
+
+interface successProps {}
+const Success = () => {
+  return (
+    <div className="w-full max-w-full  mb-6  sm:flex-none xl:mb-0 xl:w-fit">
+      <NextUiCard isFooterBlurred radius="lg" className="border-none">
+      <LottiePlayer src={'/animations/done.lottie'} />
+        <CardFooter className="justify-between before:bg-white/10 border-white/20 border-1 overflow-hidden py-1 absolute before:rounded-xl rounded-large bottom-1 w-[calc(100%_-_8px)] shadow-small ml-1 z-10">
+          <p className="text-tiny text-white/80">Available soon.</p>
+          <Button
+            className="text-tiny text-white bg-black/20"
+            variant="flat"
+            color="default"
+            radius="lg"
+            size="sm"
+          >
+            Notify me
+          </Button>
+        </CardFooter>
+      </NextUiCard>
+    </div>
   );
 };

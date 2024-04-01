@@ -12,6 +12,6 @@ export const getInvoices = async () => {
     .from("invoices")
     .select("*, user:users(*)")
     .range(0, 5)
-    .order("created_at", { ascending: false });
+    .order("bought_at", { ascending: false });
   return invoices;
 };

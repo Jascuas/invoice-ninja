@@ -7,6 +7,13 @@ export const dateFormatLg = (sbDate: string) => {
     minute: "2-digit",
   }).format(new Date(sbDate));
 };
+export const dateFormatSm = (sbDate: string) => {
+  return new Intl.DateTimeFormat("es-ES", {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+  }).format(new Date(sbDate));
+};
 export const formatCurrency = (
   amount: number,
   fiat?: string,

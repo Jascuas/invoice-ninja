@@ -20,5 +20,4 @@ export const addLineProducts = async (products?: ProductInfo[]) => {
   const res = await supabase.from("invoice_products").insert(products).select();
 
   return res;
-  //revalidatePath(`/?content=${sub_total.toString()}`);
 };
